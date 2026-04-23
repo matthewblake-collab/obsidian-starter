@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your AI Bot Setup — Telegram + Slack + Daily Routines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0d0b14;--paper:#f4f1fb;--cream:#ebe6f8;--purple:#7c3aed;--violet:#a855f7;--indigo:#4f46e5;--lavender:#c4b5fd;--deep:#1a1030;--midnight:#0f0a1e;--mist:#ddd6fe;--rose:#e85c7a;--teal:#0d9488;--amber:#d97706;--green:#1a8c6b;--green-bright:#22b589}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.masthead{background:var(--midnight);color:var(--paper);padding:72px 60px 56px;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(26,140,107,0.18) 0%,transparent 65%);pointer-events:none}
+.masthead::after{content:'';position:absolute;bottom:-80px;left:20%;width:500px;height:300px;background:radial-gradient(circle,rgba(124,58,237,0.12) 0%,transparent 70%);pointer-events:none}
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--green-bright);margin-bottom:20px;position:relative}
+.masthead h1{font-family:'Playfair Display',serif;font-size:clamp(38px,5.5vw,72px);font-weight:900;line-height:1.02;letter-spacing:-.02em;margin-bottom:16px;position:relative}
+.masthead h1 em{font-style:italic;color:var(--green-bright)}
+.masthead-sub{font-size:16px;color:var(--mist);opacity:.8;max-width:640px;line-height:1.65;position:relative}
+.paths{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;background:var(--green)}
+.path-card{background:var(--paper);padding:28px 32px}
+.path-pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 12px;border-radius:2px;margin-bottom:12px;font-weight:600}
+.pill-a{background:rgba(26,140,107,.12);color:var(--green)}
+.pill-b{background:rgba(13,148,136,.12);color:var(--teal)}
+.pill-c{background:rgba(124,58,237,.12);color:var(--purple)}
+.path-card h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px}
+.path-card p{font-size:13.5px;color:#3a2d5a;line-height:1.65}
+.path-arrow{font-size:13px;font-family:'DM Mono',monospace;color:var(--green);margin-top:10px;font-weight:600}
+.wrap{max-width:1060px;margin:0 auto;padding:0 40px}
+.section-head{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#9580c8;padding:52px 0 20px;border-bottom:1px solid #d8d0f0;margin-bottom:44px}
+.prompts{max-width:1060px;margin:0 auto;padding:0 40px 20px;display:flex;flex-direction:column;gap:3px}
+.pcard{background:var(--midnight);border-radius:2px;overflow:hidden}
+.pcard-top{display:grid;grid-template-columns:80px 1fr}
+.pnum{background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pnum span{font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:rgba(255,255,255,.3)}
+.pcard.teal .pnum{background:var(--teal)}
+.pcard.indigo .pnum{background:var(--indigo)}
+.pcard.violet .pnum{background:#7e22ce}
+.pcard.amber .pnum{background:#92400e}
+.pcard.rose .pnum{background:#9f1239}
+.pcard.purple .pnum{background:var(--purple)}
+.pmeta{padding:24px 28px 20px}
+.ptitle{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--lavender);margin-bottom:5px;line-height:1.25}
+.pcard.teal .ptitle{color:#5eead4}
+.pcard.indigo .ptitle{color:#a5b4fc}
+.pcard.violet .ptitle{color:#d8b4fe}
+.pcard.amber .ptitle{color:#fcd34d}
+.pcard.rose .ptitle{color:#fca5a5}
+.pcard.purple .ptitle{color:#c4b5fd}
+.pdesc{font-size:13.5px;color:#8b7bb8;line-height:1.6}
+.pbadges{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.pbadge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:3px 9px;border-radius:2px}
+.bd-new{background:rgba(26,140,107,.2);color:var(--green-bright)}
+.bd-up{background:rgba(13,148,136,.15);color:#5eead4}
+.bd-ai{background:rgba(168,85,247,.15);color:#d8b4fe}
+.bd-term{background:rgba(217,119,6,.15);color:#fcd34d}
+.bd-warn{background:rgba(232,92,58,.15);color:#fb923c}
+.pbody{padding:0 28px 28px}
+.eli5{background:rgba(26,140,107,.1);border-left:3px solid var(--green);border-radius:2px;padding:12px 16px;margin-bottom:18px}
+.eli5 p{font-size:13px;color:var(--green-bright);line-height:1.6}
+.eli5 p strong{color:#86efac}
+.pcard.teal .eli5{border-left-color:var(--teal);background:rgba(13,148,136,.08)}
+.pcard.teal .eli5 p{color:#5eead4}
+.pcard.teal .eli5 p strong{color:#99f6e4}
+.pcard.indigo .eli5{border-left-color:var(--indigo);background:rgba(79,70,229,.08)}
+.pcard.indigo .eli5 p{color:#a5b4fc}
+.pcard.indigo .eli5 p strong{color:#c7d2fe}
+.pcard.violet .eli5{border-left-color:#9333ea;background:rgba(147,51,234,.08)}
+.pcard.violet .eli5 p{color:#d8b4fe}
+.pcard.violet .eli5 p strong{color:#e9d5ff}
+.pcard.amber .eli5{border-left-color:var(--amber);background:rgba(217,119,6,.08)}
+.pcard.amber .eli5 p{color:#fcd34d}
+.pcard.amber .eli5 p strong{color:#fde68a}
+.pcard.rose .eli5{border-left-color:var(--rose);background:rgba(232,92,122,.08)}
+.pcard.rose .eli5 p{color:#fca5a5}
+.pcard.rose .eli5 p strong{color:#fecaca}
+.pcard.purple .eli5{border-left-color:var(--purple);background:rgba(124,58,237,.08)}
+.pcard.purple .eli5 p{color:#c4b5fd}
+.pcard.purple .eli5 p strong{color:#e9d5ff}
+.blabel{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#4a3a6a;margin:16px 0 8px}
+.cblock{position:relative}
+.cblock pre{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:14px 52px 14px 16px;font-family:'DM Mono',monospace;font-size:12px;line-height:1.8;color:#c4b5fd;white-space:pre-wrap;word-break:break-word}
+.cblock pre .dim{color:#4a3a6a}
+.cblock pre .hi{color:#a5f3fc}
+.cblock pre .gr{color:#86efac}
+.cblock pre .am{color:#fde68a}
+.cblock pre .ro{color:#fca5a5}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(124,58,237,.3);border:1px solid rgba(124,58,237,.4);color:#c4b5fd;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;padding:5px 12px;border-radius:3px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.copy-btn:hover{background:rgba(124,58,237,.5)}
+.copy-btn.copied{background:rgba(13,148,136,.3);border-color:rgba(13,148,136,.5);color:#5eead4}
+.note{background:rgba(255,255,255,.03);border-radius:3px;padding:10px 14px;margin-top:12px}
+.note p{font-size:12.5px;color:#6d5b9e;line-height:1.6}
+.note p strong{color:#a78bfa}
+.warn{background:rgba(232,160,32,.06);border-left:3px solid var(--amber);border-radius:3px;padding:10px 14px;margin-top:12px}
+.warn p{font-size:12.5px;color:#fcd34d;line-height:1.6}
+.warn p strong{color:#fde68a}
+.band{padding:40px 60px}
+.band.green{background:var(--green)}
+.band.teal{background:var(--teal)}
+.band.indigo{background:var(--indigo)}
+.band.purple{background:var(--purple)}
+.band.midnight{background:var(--midnight)}
+.band h3{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#fff;margin-bottom:10px}
+.band p{font-size:14.5px;color:rgba(255,255,255,.82);max-width:680px;line-height:1.65}
+.band-steps{display:flex;gap:2px;margin-top:24px;flex-wrap:wrap}
+.bs{flex:1;min-width:150px;background:rgba(255,255,255,.1);padding:16px 18px;border-top:3px solid rgba(255,255,255,.25)}
+.bsn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:5px}
+.bst{font-size:13px;color:rgba(255,255,255,.88);line-height:1.5}
+.footer{background:var(--midnight);padding:44px 60px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px}
+.footer-note{font-family:'DM Mono',monospace;font-size:11px;color:#4a3a6a;line-height:1.8;max-width:460px}
+.footer-brand{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;color:var(--green-bright);text-align:right}
+.footer-sub{font-family:'DM Mono',monospace;font-size:10px;color:#4a3a6a;text-align:right;margin-top:4px}
+@media(max-width:768px){.masthead,.band,.footer{padding:40px 24px}.wrap,.prompts{padding:0 16px}.paths{grid-template-columns:1fr}.pcard-top{grid-template-columns:56px 1fr}.pnum span{font-size:28px}.ptitle{font-size:18px}.pbody{padding:0 16px 20px}}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">Free to share · ELI5 throughout · Built by Matt Blake</div>
+  <h1>Your personal <em>AI bot</em><br>in under an hour.</h1>
+  <p class="masthead-sub">How to build Jarvis — an AI assistant that lives in Telegram, watches your Slack, runs daily routines automatically, and tells you every time Anthropic releases something you should know about. No coding knowledge required. Every command has a copy button.</p>
+</div>
+
+<div class="paths">
+  <div class="path-card">
+    <div class="path-pill pill-a">Part 1 — Telegram</div>
+    <h2>Your AI on your phone</h2>
+    <p>A bot you can message from anywhere. Ask questions. Trigger actions. Get daily briefings. Takes about 15 minutes to set up.</p>
+    <p class="path-arrow">→ Start at Step 1</p>
+  </div>
+  <div class="path-card">
+    <div class="path-pill pill-b">Part 2 — Slack</div>
+    <h2>A team approval inbox</h2>
+    <p>A private Slack workspace where your bot posts work for review. You tap Approve or Reject. Nothing publishes without you. Add as many workflows as you want.</p>
+    <p class="path-arrow" style="color:var(--teal)">→ Start at Step 6</p>
+  </div>
+  <div class="path-card">
+    <div class="path-pill pill-c">Part 3 — Daily Routines</div>
+    <h2>Things that run automatically</h2>
+    <p>Set Jarvis to check for new AI features every morning at 8am, summarise them, and tell you which ones matter to your work. Zero effort after setup.</p>
+    <p class="path-arrow" style="color:var(--purple)">→ Start at Step 9</p>
+  </div>
+</div>
+
+<!-- PART 1 — TELEGRAM -->
+<div class="wrap"><div class="section-head">Part 1 — Telegram Bot Setup · Steps 1–5</div></div>
+<div class="prompts">
+
+<div class="pcard">
+  <div class="pcard-top">
+    <div class="pnum"><span>1</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Create your bot with BotFather (5 minutes, no code)</div>
+      <div class="pdesc">BotFather is Telegram's official bot for creating other bots. You just have a conversation with it and it hands you a key. That's it.</div>
+      <div class="pbadges"><span class="pbadge bd-new">Telegram only</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>What is a Telegram bot?</strong> It's an automated account in Telegram you can message like a person. You send it a message, it reads it, and it replies. It can also send YOU messages on a schedule — like a daily briefing. Unlike a real person it's available 24/7 and can be connected to AI.</p></div>
+    <div class="blabel">Step 1 — Open Telegram and search for BotFather:</div>
+    <div class="cblock"><pre>Open Telegram on your phone or computer.
+In the search bar type: @BotFather
+Open the chat with the verified blue tick.
+Tap Start.</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 2 — Create your bot:</div>
+    <div class="cblock"><pre>/newbot</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>BotFather will ask you two things: a <strong>display name</strong> (e.g. "Jarvis") and a <strong>username</strong> (must end in 'bot', e.g. "my_jarvis_bot"). The username is permanent — pick something you like. The display name can be changed later.</p></div>
+    <div class="blabel">Step 3 — Save your bot token (BotFather gives it to you):</div>
+    <div class="cblock"><pre><span class="dim"># BotFather will send you something like this — copy it and save it safely:</span>
+1234567890:ABCDEFghijklmnop-QRSTUVwxyz12345678
+
+<span class="dim"># This is your TELEGRAM_BOT_TOKEN. Never share it publicly.</span>
+<span class="dim"># If you lose it or it leaks: /token in BotFather to regenerate.</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="warn"><p><strong>⚠️ Keep this token private.</strong> Anyone who has it can send messages as your bot and read all messages it receives. Treat it like a password.</p></div>
+  </div>
+</div>
+
+<div class="pcard teal">
+  <div class="pcard-top">
+    <div class="pnum"><span>2</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Find your personal Telegram chat ID</div>
+      <div class="pdesc">Your bot needs to know who to talk to. This step gives it your unique ID so it sends messages to you and only you.</div>
+      <div class="pbadges"><span class="pbadge bd-new">Telegram only</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>Why do you need this?</strong> Your Telegram account has a hidden ID number. Your bot uses it to know where to send messages. Without it, the bot would have no idea who to DM. It's like knowing the house number before you can post a letter.</p></div>
+    <div class="blabel">Find your chat ID in 30 seconds — search Telegram for:</div>
+    <div class="cblock"><pre>@userinfobot</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>Open that bot and tap Start. It immediately replies with your ID number — something like <strong>123456789</strong>. Copy it. This is your <strong>TELEGRAM_MATT_CHAT_ID</strong> (or replace "MATT" with your name). Save it alongside your bot token.</p></div>
+    <div class="blabel">Also send your new bot a message first — type anything like "hello":</div>
+    <div class="cblock"><pre><span class="dim"># In Telegram, search for your new bot by its @username and send it any message.</span>
+<span class="dim"># This is required before the bot can message YOU first.</span>
+<span class="dim"># If you skip this, the bot will be unable to send you the first DM.</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+  </div>
+</div>
+
+<div class="pcard indigo">
+  <div class="pcard-top">
+    <div class="pnum"><span>3</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Install what you need (Mac only — one command)</div>
+      <div class="pdesc">The bot runs on your computer. This installs Claude Code (the AI engine) and Python if you don't have them.</div>
+      <div class="pbadges"><span class="pbadge bd-term">Terminal</span><span class="pbadge bd-new">One time only</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>What is Terminal?</strong> A text window where you type instructions directly to your computer instead of clicking. On a Mac: press Cmd+Space, type "Terminal", press Enter. Then paste each command below and press Enter. That's all it is — just typing instructions.</p></div>
+    <div class="blabel">Check if Homebrew (Mac's package manager) is installed:</div>
+    <div class="cblock"><pre>brew --version</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>If it says "command not found", install Homebrew first: <strong>visit brew.sh</strong> and paste their one-line install command into Terminal.</p></div>
+    <div class="blabel">Install Python (if needed):</div>
+    <div class="cblock"><pre>python3 --version
+<span class="dim"># If it prints a version like 3.11.x you're done — skip the next line</span>
+brew install python3</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Install Claude Code (the AI engine Jarvis uses):</div>
+    <div class="cblock"><pre>npm install -g @anthropic-ai/claude-code</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>Claude Code needs an Anthropic account and subscription at <strong>claude.ai</strong>. If you don't have one, sign up at claude.ai first — then run <strong>claude login</strong> in Terminal to link your account.</p></div>
+  </div>
+</div>
+
+<div class="pcard violet">
+  <div class="pcard-top">
+    <div class="pnum"><span>4</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Save your tokens as environment variables</div>
+      <div class="pdesc">Environment variables are like sticky notes your computer keeps permanently. The bot reads them every time it starts. You set them once and never have to type them again.</div>
+      <div class="pbadges"><span class="pbadge bd-term">Terminal</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>What is an environment variable?</strong> Think of it as a saved password your computer remembers. Instead of your bot code containing your secret token (which is dangerous), your computer holds it separately and gives it to the bot when asked. You set it once in a file called .zshrc and it's there forever.</p></div>
+    <div class="blabel">Open your shell settings file in a text editor:</div>
+    <div class="cblock"><pre>open ~/.zshrc</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>If it says "file not found", run <strong>touch ~/.zshrc</strong> first to create it, then run open again.</p></div>
+    <div class="blabel">Add these lines at the bottom — replace with your real values:</div>
+    <div class="cblock"><pre><span class="dim"># Jarvis / Telegram bot credentials</span>
+export TELEGRAM_BOT_TOKEN="<span class="am">paste-your-bot-token-here</span>"
+export TELEGRAM_MATT_CHAT_ID="<span class="am">paste-your-chat-id-here</span>"
+
+<span class="dim"># Claude Code binary location (run 'which claude' in Terminal to confirm)</span>
+export CLAUDE_BIN="$HOME/.local/bin/claude"</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Save the file, then reload it:</div>
+    <div class="cblock"><pre>source ~/.zshrc</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Confirm it worked:</div>
+    <div class="cblock"><pre>echo "Token starts with: ${TELEGRAM_BOT_TOKEN:0:10}"
+echo "Chat ID: $TELEGRAM_MATT_CHAT_ID"</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>You should see the first 10 characters of your token and your chat ID number. If you see blank lines, the source command didn't work — close Terminal, open a new one, and try echo again.</p></div>
+  </div>
+</div>
+
+<div class="pcard amber">
+  <div class="pcard-top">
+    <div class="pnum"><span>5</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Create the Jarvis bot file and start it running</div>
+      <div class="pdesc">This is the brain of your bot. One Python file. You create it, run it once, and it keeps running in the background for as long as your computer is on.</div>
+      <div class="pbadges"><span class="pbadge bd-term">Terminal</span><span class="pbadge bd-ai">AI-powered</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>What does this bot actually do?</strong> Once it's running: you send it any message on Telegram, it passes your message to Claude (the AI), Claude replies, Jarvis sends that reply back to you. It also runs daily checks at a time you choose and DMs you the results. It's like having a smart assistant available 24/7 on your phone.</p></div>
+    <div class="blabel">Step 1 — Create a folder for it:</div>
+    <div class="cblock"><pre>mkdir -p ~/jarvis && cd ~/jarvis</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 2 — Create the bot file (paste this entire block into Terminal):</div>
+    <div class="cblock"><pre>cat > ~/jarvis/jarvis_bot.py << 'PYEOF'
+#!/usr/bin/env python3
+"""Jarvis — AI Telegram bot powered by Claude Code.
+Replies to your messages using Claude. Runs daily checks at 8am.
+Set TELEGRAM_BOT_TOKEN and TELEGRAM_MATT_CHAT_ID in ~/.zshrc first.
+"""
+import json, os, subprocess, sys, time, urllib.request, urllib.error
+from datetime import datetime, timezone, timedelta
+
+BOT_TOKEN  = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+CHAT_ID    = int(os.environ.get("TELEGRAM_MATT_CHAT_ID", "0"))
+CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "/Users/" + os.environ.get("USER","") + "/.local/bin/claude")
+YOUR_NAME  = os.environ.get("JARVIS_YOUR_NAME", "Boss")
+YOUR_WORK  = os.environ.get("JARVIS_YOUR_WORK", "a solo founder building a product")
+AEST       = timezone(timedelta(hours=10))  # Change to your timezone offset
+
+# ── Customise this to describe you and your work ──────────────────────────────
+SYSTEM_CONTEXT = f"""You are Jarvis, a personal AI assistant for {YOUR_NAME}.
+They are {YOUR_WORK}.
+
+Rules:
+- Always call them '{YOUR_NAME}'
+- Keep replies short and direct — they're messaging from their phone
+- If asked to run something in code, explain what it does first
+- Personality: calm, capable, no fluff, occasionally dry humour"""
+
+# ── Daily routine: checks for new Anthropic features at 8am ──────────────────
+FEATURES_PROMPT = """Search the web and check these sources for any new Anthropic 
+features, Claude Code skills, MCP servers, or AI tools announced in the last 7 days:
+- https://docs.anthropic.com/en/release-notes/overview
+- https://www.anthropic.com/news
+
+For each genuinely new item found, rate its relevance to my specific workflow.
+Format your response for Telegram (no markdown headers, plain text):
+
+Anthropic Features Check — [today's date]
+
+[Item name]: [1-line description]
+Relevance: HIGH / MEDIUM / LOW — [one sentence why it matters to my work]
+
+If nothing new in the last 7 days, reply with exactly:
+No new Anthropic features since last check."""
+
+STATE_FILE = os.path.expanduser("~/jarvis/state.json")
+
+def log(msg):
+    print(f"[{datetime.now().isoformat(timespec='seconds')}] {msg}", flush=True)
+
+def tg(method, **params):
+    url  = f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
+    data = json.dumps(params).encode()
+    req  = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read())
+
+def send(text):
+    if len(text) > 4000:
+        text = text[:3997] + "..."
+    try:
+        tg("sendMessage", chat_id=CHAT_ID, text=text)
+    except Exception as e:
+        log(f"send failed: {e}")
+
+def ask_claude(user_text, history):
+    convo = ""
+    for msg in history[-10:]:
+        role = YOUR_NAME if msg["role"] == "user" else "Jarvis"
+        convo += f"{role}: {msg['content']}\n"
+    prompt = f"{SYSTEM_CONTEXT}\n\nConversation:\n{convo}{YOUR_NAME}: {user_text}\nJarvis:"
+    result = subprocess.run(
+        [CLAUDE_BIN, "--print", prompt, "--allowedTools", "Read,WebSearch,WebFetch"],
+        capture_output=True, text=True, timeout=90, cwd=os.path.expanduser("~")
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"claude error: {result.stderr[:200]}")
+    return result.stdout.strip()
+
+def run_features_check():
+    log("Running Anthropic features check...")
+    result = subprocess.run(
+        [CLAUDE_BIN, "--print", FEATURES_PROMPT, "--allowedTools", "Read,WebSearch,WebFetch"],
+        capture_output=True, text=True, timeout=120, cwd=os.path.expanduser("~")
+    )
+    if result.returncode == 0 and result.stdout.strip():
+        send(result.stdout.strip())
+        log("Features check sent.")
+    else:
+        log(f"Features check failed: {result.stderr[:200]}")
+        send(f"Features check failed today {YOUR_NAME}. Check jarvis.log for details.")
+
+def load_state():
+    try: return json.loads(open(STATE_FILE).read())
+    except: return {}
+
+def save_state(state):
+    with open(STATE_FILE, "w") as f: json.dump(state, f, indent=2)
+
+def should_run_features_check(state):
+    now = datetime.now(tz=AEST)
+    if now.hour != 8: return False          # Change 8 to any hour you want
+    today = now.strftime("%Y-%m-%d")
+    return state.get("last_features_check") != today
+
+def main():
+    if not BOT_TOKEN or not CHAT_ID:
+        log("FATAL: set TELEGRAM_BOT_TOKEN and TELEGRAM_MATT_CHAT_ID in ~/.zshrc"); sys.exit(1)
+    if not os.path.exists(CLAUDE_BIN):
+        log(f"FATAL: claude not found at {CLAUDE_BIN}. Run 'which claude' to find it."); sys.exit(1)
+    log(f"Jarvis online — watching for messages from chat {CHAT_ID}")
+    send(f"Jarvis online, {YOUR_NAME}.")
+    offset, history, state = 0, [], load_state()
+    while True:
+        try:
+            if should_run_features_check(state):
+                today = datetime.now(tz=AEST).strftime("%Y-%m-%d")
+                state["last_features_check"] = today
+                save_state(state)
+                run_features_check()
+            resp = tg("getUpdates", offset=offset, timeout=20, allowed_updates=["message"])
+            for update in resp.get("result", []):
+                offset = update["update_id"] + 1
+                msg    = update.get("message", {})
+                if msg.get("chat", {}).get("id") != CHAT_ID: continue
+                text   = msg.get("text", "").strip()
+                if not text: continue
+                log(f"Received: {text[:80]}")
+                try:
+                    reply = ask_claude(text, history)
+                    history.append({"role":"user","content":text})
+                    history.append({"role":"assistant","content":reply})
+                    history = history[-20:]
+                    send(reply)
+                except Exception as e:
+                    send(f"Sorry {YOUR_NAME}, something went wrong: {e}")
+        except urllib.error.URLError as e:
+            log(f"Network error: {e} — retrying"); time.sleep(5)
+        except Exception as e:
+            log(f"Error: {e} — retrying"); time.sleep(5)
+
+if __name__ == "__main__":
+    main()
+PYEOF
+chmod +x ~/jarvis/jarvis_bot.py
+echo "Created: ~/jarvis/jarvis_bot.py"</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 3 — Customise it with your name and what you do (optional but recommended):</div>
+    <div class="cblock"><pre><span class="dim"># Add these lines to ~/.zshrc before the bot token lines:</span>
+export JARVIS_YOUR_NAME="<span class="am">Your Name</span>"
+export JARVIS_YOUR_WORK="<span class="am">a designer building client websites</span>"
+
+<span class="dim"># Then reload:</span>
+source ~/.zshrc</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 4 — Run it for the first time:</div>
+    <div class="cblock"><pre>cd ~/jarvis
+python3 jarvis_bot.py</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>You should see <strong>"Jarvis online"</strong> in Terminal and receive a Telegram message saying the same. Now send your bot any message from Telegram — it will reply within ~10 seconds. Press Ctrl+C in Terminal to stop it.</p></div>
+  </div>
+</div>
+
+</div>
+
+<!-- HOW TO KEEP IT RUNNING -->
+<div class="band green" style="margin:3px 0">
+  <h3>Keep Jarvis running 24/7 (even when Terminal is closed)</h3>
+  <p>Right now Jarvis only runs while that Terminal window is open. To make it run in the background permanently — even after a restart — you register it as a launchd service (Mac's built-in "run this forever" system).</p>
+  <div class="band-steps">
+    <div class="bs"><div class="bsn">Step 01</div><div class="bst">Create the plist file (see Step 5b below)</div></div>
+    <div class="bs"><div class="bsn">Step 02</div><div class="bst">Move it to ~/Library/LaunchAgents/</div></div>
+    <div class="bs"><div class="bsn">Step 03</div><div class="bst">Run: launchctl bootstrap to register it</div></div>
+    <div class="bs"><div class="bsn">Step 04</div><div class="bst">Mac now starts Jarvis at login and restarts it if it crashes</div></div>
+  </div>
+</div>
+
+<div class="prompts">
+
+<div class="pcard">
+  <div class="pcard-top">
+    <div class="pnum"><span>5b</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Make Jarvis run automatically in the background forever</div>
+      <div class="pdesc">Register Jarvis as a Mac background service. It starts at login and restarts automatically if it ever crashes.</div>
+      <div class="pbadges"><span class="pbadge bd-term">Terminal</span><span class="pbadge bd-warn">Mac only</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>What is launchd?</strong> It's macOS's built-in service manager — the same system that keeps Spotlight, iCloud, and Bluetooth running in the background without you thinking about it. You tell it "run this script at login and keep it alive" and it handles the rest forever.</p></div>
+    <div class="blabel">Create the launchd service file:</div>
+    <div class="cblock"><pre>cat > ~/Library/LaunchAgents/com.jarvis.bot.plist << 'PLISTEOF'
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+&lt;plist version="1.0"&gt;
+&lt;dict&gt;
+  &lt;key&gt;Label&lt;/key&gt;
+  &lt;string&gt;com.jarvis.bot&lt;/string&gt;
+  &lt;key&gt;ProgramArguments&lt;/key&gt;
+  &lt;array&gt;
+    &lt;string&gt;/bin/zsh&lt;/string&gt;
+    &lt;string&gt;-l&lt;/string&gt;
+    &lt;string&gt;-c&lt;/string&gt;
+    &lt;string&gt;python3 /Users/YOUR_USERNAME/jarvis/jarvis_bot.py&lt;/string&gt;
+  &lt;/array&gt;
+  &lt;key&gt;RunAtLoad&lt;/key&gt;
+  &lt;true/&gt;
+  &lt;key&gt;KeepAlive&lt;/key&gt;
+  &lt;true/&gt;
+  &lt;key&gt;StandardOutPath&lt;/key&gt;
+  &lt;string&gt;/Users/YOUR_USERNAME/jarvis/jarvis.log&lt;/string&gt;
+  &lt;key&gt;StandardErrorPath&lt;/key&gt;
+  &lt;string&gt;/Users/YOUR_USERNAME/jarvis/jarvis-error.log&lt;/string&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
+PLISTEOF
+echo "Created plist file"</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="warn"><p><strong>Replace YOUR_USERNAME</strong> with your actual Mac username. Run <strong>echo $USER</strong> in Terminal to find it. You need to update it in 4 places in the file above.</p></div>
+    <div class="blabel">Register and start it:</div>
+    <div class="cblock"><pre>launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jarvis.bot.plist
+launchctl list | grep com.jarvis.bot</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>You should see a line with <strong>com.jarvis.bot</strong> in the output. A number in the first column means it's running. A dash means it ran and exited — check jarvis.log for errors.</p></div>
+    <div class="blabel">Check it's working and see the live log:</div>
+    <div class="cblock"><pre>tail -f ~/jarvis/jarvis.log</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">If you need to restart Jarvis (e.g. after editing the bot file):</div>
+    <div class="cblock"><pre>launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.jarvis.bot.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jarvis.bot.plist</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+  </div>
+</div>
+
+</div>
+
+<!-- PART 2 — SLACK -->
+<div class="wrap"><div class="section-head">Part 2 — Slack Bot Setup · Steps 6–8</div></div>
+<div class="prompts">
+
+<div class="pcard teal">
+  <div class="pcard-top">
+    <div class="pnum"><span>6</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Create your Slack workspace and channels</div>
+      <div class="pdesc">A free private Slack workspace becomes your bot's visual inbox. Your bot posts cards here. You approve, reject, or edit them. Nothing goes anywhere without your say-so.</div>
+      <div class="pbadges"><span class="pbadge bd-new">Free tier works</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>Why Slack instead of just Telegram?</strong> Telegram is great for back-and-forth chat. Slack is better for visual review — cards with buttons, file previews, threaded conversations. Use Telegram to talk to your bot, use Slack to review and approve what it creates. Different jobs.</p></div>
+    <div class="blabel">Create your workspace:</div>
+    <div class="cblock"><pre>Go to: https://slack.com/get-started
+Click "Create a Workspace"
+Use your work email (e.g. you@yourproject.com)
+Workspace name: e.g. "My Workflow" or "YourProject HQ"
+Skip the "invite teammates" step — this is solo</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Create these channels (click + Add channels in the sidebar):</div>
+    <div class="cblock"><pre><span class="hi">#content-approval</span>   <span class="dim">← where your bot posts work for you to review</span>
+<span class="hi">#posted</span>             <span class="dim">← log of everything that went live (optional)</span>
+<span class="hi">#alerts</span>             <span class="dim">← errors and failures (optional)</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>The free Slack plan is enough for personal workflows. You won't hit any meaningful limits for solo or small-team use.</p></div>
+  </div>
+</div>
+
+<div class="pcard indigo">
+  <div class="pcard-top">
+    <div class="pnum"><span>7</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Create the Slack bot and get your tokens</div>
+      <div class="pdesc">Slack's bot tokens are what let your scripts post messages as a bot. You create them at api.slack.com — takes about 10 minutes the first time.</div>
+      <div class="pbadges"><span class="pbadge bd-new">Slack admin</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>What is a bot token?</strong> It's like a username and password combined into one long string. Your script uses it to log in to Slack as your bot, post messages, and listen for replies. You create one per app you build. Guard it the same way as your Telegram token.</p></div>
+    <div class="blabel">Step 1 — Create a new Slack app:</div>
+    <div class="cblock"><pre>Go to: https://api.slack.com/apps
+Click: Create New App → From scratch
+Name it: "My Pipeline Bot" (or anything you like)
+Select your workspace from the dropdown
+Click: Create App</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 2 — Enable Socket Mode (needed for the approval buttons to work):</div>
+    <div class="cblock"><pre>In the left sidebar: Socket Mode → Enable Socket Mode → ON
+Under App-Level Tokens → Generate Token:
+  Token name: jarvis-socket
+  Scope: connections:write
+Click Generate → copy the token (starts with xapp-)</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 3 — Add bot permissions (OAuth Scopes):</div>
+    <div class="cblock"><pre>Left sidebar: OAuth &amp; Permissions → Scopes → Bot Token Scopes
+Add these scopes:
+  chat:write
+  chat:write.public
+  channels:read
+  files:write
+  reactions:read</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 4 — Install the app to your workspace and get the bot token:</div>
+    <div class="cblock"><pre>Left sidebar: OAuth &amp; Permissions → Install to Workspace → Allow
+Copy the Bot User OAuth Token (starts with xoxb-)</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 5 — Find your channel IDs:</div>
+    <div class="cblock"><pre><span class="dim"># In Slack: right-click any channel → View channel details → scroll to bottom</span>
+<span class="dim"># The channel ID is at the bottom — looks like C0ATT8B8EA2</span>
+<span class="dim"># Copy the ID for each channel you created</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 6 — Save your config file:</div>
+    <div class="cblock"><pre>cat > ~/.slack-bot-config.json << 'EOF'
+{
+  "bot_token": "<span class="am">xoxb-your-bot-token-here</span>",
+  "channels": {
+    "approval": "<span class="am">C-your-approval-channel-id</span>",
+    "posted":   "<span class="am">C-your-posted-channel-id</span>",
+    "alerts":   "<span class="am">C-your-alerts-channel-id</span>"
+  }
+}
+EOF
+chmod 600 ~/.slack-bot-config.json
+echo "Slack config saved"</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 7 — Add the app token to ~/.zshrc:</div>
+    <div class="cblock"><pre><span class="dim"># Add to ~/.zshrc:</span>
+export SLACK_APP_TOKEN="<span class="am">xapp-your-app-token-here</span>"
+
+<span class="dim"># Reload:</span>
+source ~/.zshrc</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Step 8 — Invite the bot to your channels (do this in Slack):</div>
+    <div class="cblock"><pre><span class="dim"># In each Slack channel, type this message and send it:</span>
+/invite @My Pipeline Bot
+
+<span class="dim"># Do this for #content-approval, #posted, and #alerts</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+  </div>
+</div>
+
+<div class="pcard violet">
+  <div class="pcard-top">
+    <div class="pnum"><span>8</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Test your Slack bot with a hello world message</div>
+      <div class="pdesc">Before building anything complex, confirm your bot can post to a channel. This one-liner is the fastest way to check everything is wired correctly.</div>
+      <div class="pbadges"><span class="pbadge bd-term">Terminal</span><span class="pbadge bd-new">Smoke test</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>Why test first?</strong> The most common mistake is spending an hour building something and then discovering a typo in your token or a missing permission. This 30-second test catches every common error before you go further.</p></div>
+    <div class="blabel">Quick smoke test — posts a message to your approval channel:</div>
+    <div class="cblock"><pre>python3 - << 'PY'
+import json, urllib.request
+cfg   = json.load(open(__import__('os').path.expanduser("~/.slack-bot-config.json")))
+token = cfg["bot_token"]
+chan  = cfg["channels"]["approval"]
+body  = json.dumps({"channel": chan, "text": "Bot is wired up correctly!"}).encode()
+req   = urllib.request.Request(
+    "https://slack.com/api/chat.postMessage",
+    data=body,
+    headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+)
+resp = json.loads(urllib.request.urlopen(req).read())
+print("OK" if resp.get("ok") else f"ERROR: {resp.get('error','unknown')}")
+PY</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>You should see <strong>OK</strong> in Terminal and a "Bot is wired up correctly!" message appear in your Slack #content-approval channel. If you see an error like "not_in_channel" — go to Slack and run <strong>/invite @your-bot-name</strong> in that channel, then retry.</p></div>
+    <div class="blabel">Common errors and fixes:</div>
+    <div class="cblock"><pre><span class="ro">invalid_auth</span>      <span class="dim">→ Your bot token is wrong or was revoked. Regenerate at api.slack.com</span>
+<span class="ro">not_in_channel</span>    <span class="dim">→ /invite your bot to the channel in Slack first</span>
+<span class="ro">channel_not_found</span> <span class="dim">→ Check your channel ID in ~/.slack-bot-config.json</span>
+<span class="ro">missing_scope</span>     <span class="dim">→ Add chat:write scope at api.slack.com → OAuth & Permissions → Reinstall app</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+  </div>
+</div>
+
+</div>
+
+<!-- PART 3 — DAILY ROUTINES -->
+<div class="wrap"><div class="section-head">Part 3 — Daily Routines &amp; The Anthropic Features Check · Steps 9–11</div></div>
+<div class="prompts">
+
+<div class="pcard rose">
+  <div class="pcard-top">
+    <div class="pnum"><span>9</span></div>
+    <div class="pmeta">
+      <div class="ptitle">How Jarvis's daily routines work</div>
+      <div class="pdesc">Jarvis runs a loop every 30 seconds checking for messages from you. Once per day at 8am it also runs a special routine automatically — no trigger required from you.</div>
+      <div class="pbadges"><span class="pbadge bd-ai">Built in</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>How does it know what time it is?</strong> Every 30 seconds the bot wakes up, checks if it's 8am in your timezone, and checks whether it already ran today. If both are true, it runs the routine. If either is false, it goes back to sleep. It saves "last ran today" to a file so it doesn't run twice. Simple but bulletproof.</p></div>
+    <div class="blabel">The routine logic in plain English:</div>
+    <div class="cblock"><pre><span class="dim">Every 30 seconds, Jarvis asks:</span>
+
+1. Is it 8am in my timezone right now?
+   → If no: skip, check messages, sleep 30s, repeat
+   → If yes: go to question 2
+
+2. Did I already run today's check?
+   → Check ~/jarvis/state.json for today's date
+   → If already ran: skip
+   → If not yet ran: run the features check now
+
+3. Run features check:
+   → Call Claude with a web search prompt
+   → Claude searches Anthropic's release notes
+   → Claude summarises what's new and rates relevance to your work
+   → Jarvis DMs you the result on Telegram
+
+4. Save today's date to state.json so it won't run again today</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">To change what time the routine runs — edit jarvis_bot.py:</div>
+    <div class="cblock"><pre><span class="dim"># Find this line in jarvis_bot.py:</span>
+if now.hour != 8: return False
+
+<span class="dim"># Change 8 to any hour (0-23):</span>
+if now.hour != 7: return False   <span class="dim"># runs at 7am</span>
+if now.hour != 20: return False  <span class="dim"># runs at 8pm</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">To change your timezone — find AEST and change the offset:</div>
+    <div class="cblock"><pre><span class="dim"># Find this line in jarvis_bot.py:</span>
+AEST = timezone(timedelta(hours=10))
+
+<span class="dim"># Change the number to your UTC offset:</span>
+timezone(timedelta(hours=0))    <span class="dim"># London / GMT</span>
+timezone(timedelta(hours=-5))   <span class="dim"># New York / EST</span>
+timezone(timedelta(hours=-8))   <span class="dim"># Los Angeles / PST</span>
+timezone(timedelta(hours=1))    <span class="dim"># Paris / CET</span>
+timezone(timedelta(hours=10))   <span class="dim"># Sydney / AEST</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>After editing jarvis_bot.py, restart Jarvis: <strong>launchctl bootout</strong> then <strong>launchctl bootstrap</strong> (same commands as Step 5b).</p></div>
+  </div>
+</div>
+
+<div class="pcard purple">
+  <div class="pcard-top">
+    <div class="pnum"><span>10</span></div>
+    <div class="pmeta">
+      <div class="ptitle">The Anthropic features check — what it does and how to customise it</div>
+      <div class="pdesc">Every morning Jarvis scans Anthropic's release notes and news. It tells you what's new, rates how relevant it is to your specific work, and suggests which items to implement. Takes 30 seconds of your attention per day.</div>
+      <div class="pbadges"><span class="pbadge bd-ai">AI-powered</span><span class="pbadge bd-up">Daily automatic</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>Why does this matter?</strong> Anthropic releases new Claude features, new tools, and updates to Claude Code almost every week. Without checking, you miss things that could save you hours. With this routine, you get a daily 30-second briefing that filters the signal from the noise — HIGH relevance means "this might change how you work today", LOW means "interesting but not urgent".</p></div>
+    <div class="blabel">Example of what a morning message looks like:</div>
+    <div class="cblock"><pre><span class="gr">Anthropic Features — 23 Apr 2026</span>
+
+Claude Code web preview: New browser-based interface for running
+Claude Code sessions without a local terminal installation.
+Relevance: HIGH — You can now give non-technical collaborators
+access to Claude Code sessions from a browser link.
+
+Prompt caching improvements: Cached prompts now persist for
+5 minutes instead of 60 seconds.
+Relevance: MEDIUM — Faster for long context windows in your
+content pipeline, but no action needed.
+
+MCP GitHub connector: Official GitHub MCP server for Claude Code
+allowing read/write to repositories directly.
+Relevance: HIGH — You can automate commits from within sessions
+without git CLI commands.
+
+Reply YES to implement all HIGH items, or name which ones.</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Customise what Jarvis looks for — edit the FEATURES_PROMPT in jarvis_bot.py:</div>
+    <div class="cblock"><pre><span class="dim"># Find this section in jarvis_bot.py and edit to match YOUR work:</span>
+
+FEATURES_PROMPT = """Search the web for any new Anthropic features
+announced in the last 7 days.
+
+For each item, rate its relevance to:
+- <span class="am">[replace with your main tool or project]</span>
+- <span class="am">[replace with your second main workflow]</span>
+- <span class="am">[replace with your third main workflow]</span>
+
+Format for Telegram, no markdown, one line per item.
+Rate HIGH / MEDIUM / LOW with a one-sentence reason.
+
+If nothing new in 7 days, say: No new Anthropic features since last check."""</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Add MORE sources to check — extend the prompt:</div>
+    <div class="cblock"><pre><span class="dim"># Add any sources relevant to your work inside the FEATURES_PROMPT:</span>
+- https://docs.anthropic.com/en/release-notes/overview
+- https://www.anthropic.com/news
+- https://github.com/anthropics/anthropic-cookbook  <span class="dim"># code examples</span>
+- https://www.cursor.so/changelog                   <span class="dim"># if you use Cursor</span>
+- https://docs.github.com/en/copilot/about          <span class="dim"># if you use Copilot</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+  </div>
+</div>
+
+<div class="pcard">
+  <div class="pcard-top">
+    <div class="pnum"><span>11</span></div>
+    <div class="pmeta">
+      <div class="ptitle">Add your own daily routines — any time, any task</div>
+      <div class="pdesc">The features check is just one routine. You can add as many as you want — morning weather, project status, competitor check, content ideas, anything Claude can research or write.</div>
+      <div class="pbadges"><span class="pbadge bd-ai">Customise freely</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>A routine is just a prompt that runs at a specific time.</strong> You write a prompt that tells Claude what to check or create, add it to jarvis_bot.py with an hour, and Jarvis runs it forever. You can have one routine or twenty. Each one runs once per day at its designated hour and DMs you the result.</p></div>
+    <div class="blabel">Template for adding a new routine — paste into jarvis_bot.py:</div>
+    <div class="cblock"><pre><span class="dim"># Add your prompt (describe what you want Claude to check or write):</span>
+MY_ROUTINE_PROMPT = """[Your prompt here. Examples:
+- Check these 3 competitor websites and summarise any new features
+- Write me 5 social media post ideas about [your topic] for today
+- What is today's top news in [your industry]?
+- Summarise my last 3 Obsidian session notes and identify patterns]"""
+
+<span class="dim"># Add a check function (copy the features check pattern):</span>
+def run_my_routine():
+    log("Running my custom routine...")
+    result = subprocess.run(
+        [CLAUDE_BIN, "--print", MY_ROUTINE_PROMPT,
+         "--allowedTools", "Read,WebSearch,WebFetch"],
+        capture_output=True, text=True, timeout=120,
+        cwd=os.path.expanduser("~")
+    )
+    if result.returncode == 0:
+        send(result.stdout.strip())
+
+<span class="dim"># Add this inside the while loop (after the features check block):</span>
+now = datetime.now(tz=AEST)
+if now.hour == 9 and state.get("last_my_routine") != now.strftime("%Y-%m-%d"):
+    state["last_my_routine"] = now.strftime("%Y-%m-%d")
+    save_state(state)
+    run_my_routine()</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="blabel">Real examples of routines people build with this pattern:</div>
+    <div class="cblock"><pre><span class="hi">Morning news brief</span>       <span class="dim">Search for today's top 3 stories in [your industry]</span>
+<span class="hi">Competitor check</span>          <span class="dim">Did [competitor 1] or [competitor 2] post anything new?</span>
+<span class="hi">Content ideas</span>             <span class="dim">5 post ideas for today based on trending topics in [niche]</span>
+<span class="hi">Weather + plan</span>            <span class="dim">Today's weather in [city] and suggest how to plan my work day</span>
+<span class="hi">Weekly summary</span>            <span class="dim">Every Monday: summarise last week's Obsidian session notes</span>
+<span class="hi">Release notes watcher</span>    <span class="dim">Check [specific tool] changelog for updates since last week</span></pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+    <div class="note"><p>The pattern is always the same: write a prompt → wrap it in a function → add a time check with a state key. The state.json file tracks which routines have run today so they never fire twice. You can have as many as you want.</p></div>
+  </div>
+</div>
+
+</div>
+
+<!-- TROUBLESHOOTING -->
+<div class="band midnight" style="margin-top:3px">
+  <h3>When something breaks — the 5 most common fixes</h3>
+  <p>Almost every problem falls into one of these categories. Check from top to bottom.</p>
+  <div class="band-steps">
+    <div class="bs"><div class="bsn">Problem 1</div><div class="bst">Bot doesn't reply — check: tail -f ~/jarvis/jarvis.log to see if it's running</div></div>
+    <div class="bs"><div class="bsn">Problem 2</div><div class="bst">Claude not found — run: which claude in Terminal and update CLAUDE_BIN in ~/.zshrc</div></div>
+    <div class="bs"><div class="bsn">Problem 3</div><div class="bst">Token errors — re-run: echo $TELEGRAM_BOT_TOKEN to confirm it loaded from .zshrc</div></div>
+    <div class="bs"><div class="bsn">Problem 4</div><div class="bst">Routine not firing — check the timezone offset matches your local time</div></div>
+    <div class="bs"><div class="bsn">Problem 5</div><div class="bst">Slack bot can't post — run /invite @botname in the Slack channel first</div></div>
+  </div>
+</div>
+
+<div class="wrap"><div class="section-head">Skill file — for Claude Code users</div></div>
+<div class="prompts" style="padding-bottom:40px">
+
+<div class="pcard teal">
+  <div class="pcard-top">
+    <div class="pnum"><span>↓</span></div>
+    <div class="pmeta">
+      <div class="ptitle">The complete Claude Code skill — tells Claude Code how to set up the whole stack for you</div>
+      <div class="pdesc">If you already use Claude Code: paste this prompt into a Claude Code session and it will build the entire setup for your specific project automatically.</div>
+      <div class="pbadges"><span class="pbadge bd-ai">Claude Code</span><span class="pbadge bd-term">Terminal</span></div>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="eli5"><p><strong>What is Claude Code?</strong> It's a command-line AI tool made by Anthropic that runs on your computer. Unlike claude.ai in a browser, it can directly read and write files on your Mac. If you have it, this prompt will build your entire Jarvis setup — the bot file, the plist, the config — and start everything for you automatically.</p></div>
+    <div class="blabel">Run Claude Code first (in Terminal), then paste this prompt:</div>
+    <div class="cblock"><pre>RUN IN Terminal first:
+cd ~ && claude
+
+Then paste this prompt:
+
+Set up a complete Jarvis bot setup for me. My details:
+- My name (what Jarvis calls me): [your name or "Boss"]  
+- What I work on: [describe your project in one sentence]
+- My timezone UTC offset: [e.g. +10 for Sydney, -5 for New York, 0 for London]
+- Telegram bot token: [paste your token from BotFather]
+- Telegram chat ID: [paste your chat ID from @userinfobot]
+
+Tasks in order:
+1. Create ~/jarvis/ directory
+2. Create ~/jarvis/jarvis_bot.py with the standard Jarvis template, customised with my details
+3. Create ~/jarvis/state.json with empty JSON: {}
+4. Add TELEGRAM_BOT_TOKEN, TELEGRAM_MATT_CHAT_ID, CLAUDE_BIN to ~/.zshrc if not present
+5. Create ~/Library/LaunchAgents/com.jarvis.bot.plist with my username filled in correctly
+6. Run: launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jarvis.bot.plist
+7. Confirm it started: launchctl list | grep com.jarvis
+8. Show me the last 5 lines of ~/jarvis/jarvis.log
+
+Do not skip any step. Confirm each one before moving to the next.</pre><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-note">
+    Jarvis bot: github.com/matthewblake-collab/jarvis-bot<br>
+    Obsidian starter vault: github.com/matthewblake-collab/obsidian-starter<br>
+    Requires: Telegram account (free), Claude Code subscription (claude.ai), Python 3 (free)<br>
+    Slack free tier is sufficient. No paid plans required for personal workflows.<br>
+    Questions or improvements: matthewblake@ontrack-focus.com
+  </div>
+  <div>
+    <div class="footer-brand">Build your assistant.<br><em>Let it run.</em></div>
+    <div class="footer-sub">Jarvis · Telegram · Slack · April 2026</div>
+  </div>
+</div>
+
+<script>
+function copyBlock(btn){
+  const pre=btn.previousElementSibling;
+  const text=pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Copied ✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},2000);
+  }).catch(()=>{
+    const r=document.createRange();r.selectNode(pre);
+    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+    document.execCommand('copy');window.getSelection().removeAllRanges();
+    btn.textContent='Copied ✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},2000);
+  });
+}
+</script>
+</body>
+</html>
